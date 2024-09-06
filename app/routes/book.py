@@ -16,23 +16,31 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
 
 @router.get("/books/", response_model=List[Book])
 def read_books(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    books = book_service.get_books(db, skip=skip, limit=limit)
-    return books
+    return book_service.get_books(db, skip=skip, limit=limit)
 
 
 @router.get("/books/{book_id}", response_model=Book)
 def read_book(book_id: int, db: Session = Depends(get_db)):
-    return book_service.get_book(db, book_id=book_id)
+    book = book_service.get_book(db, book_id=book_id)
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
 
 
 @router.put("/books/{book_id}", response_model=Book)
 def update_book(book_id: int, book: BookCreate, db: Session = Depends(get_db)):
-    return book_service.update_book(db, book_id=book_id, book=book)
+    updated_book = book_service.update_book(db, book_id=book_id, book=book)
+    if updated_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return updated_book
 
 
 @router.delete("/books/{book_id}", response_model=Book)
 def delete_book(book_id: int, db: Session = Depends(get_db)):
-    return book_service.delete_book(db, book_id=book_id)
+    deleted_book = book_service.delete_book(db, book_id=book_id)
+    if deleted_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return deleted_book
 
 
 @router.post("/books/{book_id}/comments/", response_model=Comment)
@@ -53,7 +61,10 @@ def create_loan(
 
 @router.post("/loans/{loan_id}/return", response_model=Loan)
 def return_book(loan_id: int, db: Session = Depends(get_db)):
-    return book_service.return_book(db=db, loan_id=loan_id)
+    returned_loan = book_service.return_book(db=db, loan_id=loan_id)
+    if returned_loan is None:
+        raise HTTPException(status_code=404, detail="Loan not found")
+    return returned_loan
 
 
 @router.get("/books/most-read/", response_model=List[Book])

@@ -9,9 +9,12 @@ from app.schemas.user import User
 router = APIRouter()
 
 
-@router.post("/books/", response_model=Book)
-def create_book(book: BookCreate, db: Session = Depends(get_db)):
-    return book_service.create_book(db=db, book=book)
+@router.post("/books/", response_model=List[Book])
+def create_new_book(book: BookCreate, user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=400, detail="User not found")
+    return book_service.create_book(db=db, book=book, user_id=user_id)
 
 
 @router.get("/books/", response_model=List[Book])

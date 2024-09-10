@@ -6,8 +6,6 @@ from sqlalchemy.orm import Session
 from app.schemas.user import TokenData
 from app.services import user as user_service
 from config.database import SessionLocal
-import secrets
-print(secrets.token_hex(32))
 import os
 
 

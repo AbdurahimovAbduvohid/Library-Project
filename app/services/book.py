@@ -18,8 +18,8 @@ def get_books(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Book).offset(skip).limit(limit).all()
 
 
-def create_book(db: Session, book: BookCreate):
-    db_book = Book(**book.dict())
+def create_book(db: Session, book: BookCreate, user_id: int):
+    db_book = Book(title=book.title, author=book.author, publication_year=book.publication_year, user_id=user_id)
     db.add(db_book)
     db.commit()
     db.refresh(db_book)
